@@ -1,7 +1,7 @@
 import { User } from '../types';
 
 // PENTING: Ganti dengan URL Web App Anda dari Google Apps Script
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzA5nGvxQVV9Pg-ic0c54FyvGtxl58jz8z0Lf3dk7C8DXAA6HSFMSfIM_lBS995wKeT8A/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyWRffK9AZefBu9NZvCWyj_BgShFzIA65TL8KWkGJWQAjtZCILIx5pQAsDJR3zWN7cUhQ/exec";
 
 /**
  * Mengirim laporan STTK baru ke Google Apps Script menggunakan metode satu langkah (Base64).
@@ -101,13 +101,13 @@ export const approveSttkReport = async (reportId: string | number) => {
   }
 };
 
-export const exportReportsAsCSV = async (): Promise<string> => {
+export const exportReportsAsXLS = async (): Promise<string> => {
   try {
     const response = await fetch(`${WEB_APP_URL}?action=getCSVData`, { method: 'GET', redirect: 'follow' });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.text();
   } catch (error) {
-    console.error("Error exporting CSV:", error);
+    console.error("Error exporting XLS data:", error);
     throw error;
   }
 };
