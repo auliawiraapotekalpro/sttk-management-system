@@ -10,7 +10,8 @@ import { SttkEntry } from './hooks/useMockData';
 import {
   LayoutDashboard, Database, Trophy, PlusCircle, Menu, Download, Check, LogOut, BarChartBig
 } from 'lucide-react';
-import { getAllReports, approveSttkReport, exportReportsAsCSV } from './services/apiService';
+import { getAllReports, approveSttkReport, exportReportsAsXLS } from './services/apiService';
+import * as XLSX from 'xlsx';
 
 type View = 'dashboard' | 'dataSttk' | 'kpi' | 'addData' | 'managerDashboard';
 
@@ -73,20 +74,27 @@ const App: React.FC = () => {
     }
   };
 
-  const handleExportCSV = async () => {
+  const handleExportXLS = async () => {
     try {
-      const csvData = await exportReportsAsCSV();
-      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      const csvData = await exportReportsAsXLS();
+      
+      // Parse CSV data. This creates a workbook object.
+      const workbook = XLSX.read(csvData, { type: 'string', raw: true });
+
+      // Generate XLSX file and trigger download
+      const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
-      link.setAttribute("download", `STTK_Reports_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute("download", `STTK_Reports_${new Date().toISOString().split('T')[0]}.xlsx`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error("Failed to export CSV:", error);
-      alert("Gagal mengunduh file CSV.");
+      console.error("Failed to export XLSX:", error);
+      alert("Gagal mengunduh file XLSX.");
     }
   };
 
@@ -160,10 +168,10 @@ const App: React.FC = () => {
             </div>
             <div className="flex items-center gap-4">
                  <button 
-                    onClick={handleExportCSV}
+                    onClick={handleExportXLS}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg shadow-sm hover:bg-green-700 transition-colors">
                     <Download size={16}/>
-                    Export CSV
+                    Export XLSX
                 </button>
                  <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg shadow-sm hover:bg-gray-300 transition-colors">
                     <LogOut size={16}/>
